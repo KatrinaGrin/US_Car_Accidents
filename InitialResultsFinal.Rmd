@@ -1,0 +1,448 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+
+library(plyr)
+setwd("/Users/ekaterinagrigoreva/Documents")
+
+library(readr)
+US_Accidents <- read_csv("USAccidents.csv")
+View(US_Accidents)
+
+#reviewing the internal structure of the dataset 
+str(US_Accidents)
+
+#calculating descriptive statistics
+summary(US_Accidents)
+
+#Assignment3 
+#checking for missing values
+#is.na(US_Accidents$Severity)
+sum(is.na(US_Accidents$Severity))
+
+#is.na(US_Accidents$Temperature)
+sum(is.na(US_Accidents$Temperature))
+
+#is.na(US_Accidents$Wind_Chill)
+sum(is.na(US_Accidents$Wind_Chill))
+
+#is.na(US_Accidents$Humidity)
+sum(is.na(US_Accidents$Humidity))
+
+#is.na(US_Accidents$Pressure)
+sum(is.na(US_Accidents$Pressure))
+
+#is.na(US_Accidents$Visibility)
+sum(is.na(US_Accidents$Visibility))
+
+#is.na(US_Accidents$Wind_Speed)
+sum(is.na(US_Accidents$Wind_Speed))
+
+#is.na(US_Accidents$Precipitation)
+sum(is.na(US_Accidents$Precipitation))
+
+#excluding missing values from analysis 
+clean_US_Accidents <- na.omit(US_Accidents)
+View(clean_US_Accidents)
+sum(is.na(clean_US_Accidents))
+
+#renaming some columns with () to avoid extra () in the code 
+colnames(clean_US_Accidents)
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Distance(mi)'] <- 'Distance'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Temperature(F)'] <- 'Temperature'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Wind_Chill(F)'] <- 'Wind_Chill'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Humidity(%)'] <- 'Humidity'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Pressure(in)'] <- 'Pressure'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Visibility(mi)'] <- 'Visibility'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Wind_Speed(mph)'] <- 'Wind_Speed'
+names(clean_US_Accidents)[names(clean_US_Accidents) == 'Precipitation(in)'] <- 'Precipitation'
+View(clean_US_Accidents)
+
+#checking for outliers and looking at number of values above 95th percentile 
+sum(clean_US_Accidents$Severity > quantile(clean_US_Accidents$Severity, .95))
+sum(clean_US_Accidents$Temperature > quantile(clean_US_Accidents$Temperature, .95))
+sum(clean_US_Accidents$Wind_Chill > quantile(clean_US_Accidents$Wind_Chill, .95))
+sum(clean_US_Accidents$Humidity > quantile(clean_US_Accidents$Humidity, .95))
+sum(clean_US_Accidents$Pressure > quantile(clean_US_Accidents$Pressure, .95))
+sum(clean_US_Accidents$Visibility > quantile(clean_US_Accidents$Visibility, .95))
+sum(clean_US_Accidents$Wind_Speed > quantile(clean_US_Accidents$Wind_Speed, .95))
+sum(clean_US_Accidents$Precipitation > quantile(clean_US_Accidents$Precipitation, .95))
+
+#counting the number of accidents for each severity group from 1 to 4 
+#install.packages('dplyr') 
+library(dplyr)
+count(clean_US_Accidents, Severity)
+
+#plotting the accident severity
+table(clean_US_Accidents$Severity)
+plot(table(clean_US_Accidents$Severity),
+     type = "h",
+     xlab = "Severity level 1 (less severe) to 4 (most severe)",
+     ylab = "Number of accidents",
+     col = "blue",
+     main = "Severity from 1 to 4 (less severe to most severe")
+#level 2 severity is the most common type of accidents 
+
+#finding covariance between Severity and other numerical variables 
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Temperature)
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Wind_Chill)
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Humidity)
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Pressure)
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Visibility)     
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Wind_Speed)
+cov(clean_US_Accidents$Severity, clean_US_Accidents$Precipitation)
+
+library(ggplot2)
+
+#defining and plotting linear regression model between Severity and other numerical variables  
+x <- clean_US_Accidents$Temperature
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "blue", main = "Linear regression model of Severity and Temperature",
+     xlab = "Temperature", ylab = "Severity")
+
+x <- clean_US_Accidents$Wind_Chill
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "green", main = "Linear regression model of Severity and Wind Chill",
+     xlab = "Wind_Chill", ylab = "Severity")
+
+x <- clean_US_Accidents$Humidity
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "orange", main = "Linear regression model of Severity and Humidity",
+     xlab = "Humidity", ylab = "Severity")
+
+x <- clean_US_Accidents$Pressure
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "purple", main = "Linear regression model of Severity and Pressure",
+     xlab = "Pressure", ylab = "Severity")
+
+x <- clean_US_Accidents$Visibility
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "red", main = "Linear regression model of Severity and Visibility",
+     xlab = "Visibility", ylab = "Severity")
+
+x <- clean_US_Accidents$Wind_Speed
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "dark blue", main = "Linear regression model of Severity and Wind_Speed",
+     xlab = "Wind_Speed", ylab = "Severity")
+
+x <- clean_US_Accidents$Precipitation
+y <- clean_US_Accidents$Severity
+lmModel <- lm(y ~ x, data = clean_US_Accidents)
+lmModel
+
+plot(x, y, col = "dark green", main = "Linear regression model of Severity and Precipitation",
+     xlab = "Precipitation", ylab = "Severity")
+
+#data visualization 
+plot(clean_US_Accidents$Temperature, clean_US_Accidents$Severity)
+plot(clean_US_Accidents$Wind_Chill, clean_US_Accidents$Severity)
+plot(clean_US_Accidents$Humidity, clean_US_Accidents$Severity)
+plot(clean_US_Accidents$Pressure, clean_US_Accidents$Severity)
+plot(clean_US_Accidents$Visibility, clean_US_Accidents$Severity)
+plot(clean_US_Accidents$Wind_Speed, clean_US_Accidents$Severity)
+plot(clean_US_Accidents$Precipitation, clean_US_Accidents$Severity)
+
+#calculating the amount of accidents by state 
+aggregate(clean_US_Accidents$Severity, by = list(State=clean_US_Accidents$State), FUN = sum)
+
+#creating multiple linear regression model to predict Severity 
+vars <- c("Severity", "Temperature", "Wind_Chill", "Humidity", "Pressure", "Visibility", "Wind_Speed", "Precipitation")
+pairs(clean_US_Accidents[vars], col = "pink")
+
+#State  with the largest number of accidents: chr [1:1516064] 
+#checking for missing values 
+#is.na(clean_US_Accidents$State)
+sum(is.na(clean_US_Accidents$State))
+#0 missing values 
+
+#sorting the number of the accident occurrences by city  
+head(sort(table(clean_US_Accidents$State),decreasing=TRUE), n = 5)
+plot(head(sort(table(clean_US_Accidents$State),decreasing=TRUE), n = 5))
+"
+Top 5 states with the largest number of accidents (from February 2016 to Dec 2020):
+California: 77394 
+Florida: 53115 
+Oregon: 27582 
+Pennsylvania: 17228
+South Carolina: 15570
+"
+
+#City with the largest number of accidents: chr [1:1516064]
+#checking for missing values 
+#is.na(clean_US_Accidents$City)
+sum(is.na(clean_US_Accidents$City))
+#0 missing values 
+
+#sorting the number of the accident occurrences by city  
+head(sort(table(clean_US_Accidents$City),decreasing=TRUE), n = 5)
+plot(head(sort(table(clean_US_Accidents$City),decreasing=TRUE), n = 5))
+"Top 5 cities  with the largest number of accidents (from February 2016 to Dec 2020):
+Miami 15862  
+Los Angeles 7541 
+Orlando 6692 
+Charlotte: 5633 
+Houston: 4950
+" 
+
+"
+Severity variable shows the severity of the accident, a number between 1 and 4, where 
+1 - indicates the least impact on traffic (i.e., short delay as a result of the accident) 
+4 - indicates a significant impact on traffic (i.e., long delay).
+"
+
+#calculating frequencies for Severity ~ Weather_Condition to see the largest number of accidents in certain weather conditions 
+sum(is.na(clean_US_Accidents$Weather_Condition))
+xtabs(Severity ~ Weather_Condition, data = clean_US_Accidents)
+sort(xtabs(Severity ~ Weather_Condition, data = clean_US_Accidents), decreasing=TRUE)
+plot(sort(xtabs(Severity ~ Weather_Condition, data = clean_US_Accidents), decreasing=TRUE))
+
+"converting Severity Numerical variable into Categorical, where 
+0 (less severe) = 1 and 2 
+1 (more severe) = 3 and 4"
+
+catSevere <- cut(clean_US_Accidents$Severity, breaks = c(0, 2, 5), labels = c(0, 1))
+
+#creating a Logistic Regression Model for Severity and Weather Condition.
+
+simpleLog <- glm(catSevere ~ Weather_Condition, data = clean_US_Accidents, family = "binomial")
+summary(simpleLog)
+
+"
+As per the Logistic Regression Model the formula to predict severity would be as follows:
+Predicting Severity for 0 (less severe: 1&2)  = -1.257e+01 + Estimate for Weather_Condition x 0
+which is equal to the following:
+Predicting Severity for 0 (less severe: 1&2)  = -1.257e+01
+
+Predicting Severity for 1 (more severe: 3&4)  = -1.257e+01 + Estimate for Weather_Condition x 1
+which is equal to the following:
+Predicting Severity for 1 (more severe: 3&4)  = -1.257e+01 + Estimate for Weather_Condition
+
+All P values are greater than 0.5 meaning that each Weather Condition don't have a statistically significant relationship with the response variable in the model.
+"
+
+#Logistic Regresion Model using all natural and weather related factors
+log <- glm(catSevere ~ Start_Time + End_Time + Temperature + Wind_Chill +  Humidity + Pressure + Visibility + Wind_Direction + Wind_Speed + Precipitation + Weather_Condition, data = clean_US_Accidents, family = "binomial")
+summary(log)
+plot(log)
+
+"
+Regression Coefficient 
++ positive correlation of the accident severity with the following variables:
+End Time, 
+Temperature, 
+Humidity, 
+Visibility, 
+Wind_Direction: E, N, NE, NNE, S, SE, SSW, SW, W, WNW, 
+Wind_Speed, 
+Weather_Condition: Blowing Dust / Windy, Blowing Snow, Blowing Snow / Windy, Clear, Cloudy, Cloudy / Windy, Drizzle, Drizzle and Fog, Fair, Fair / Windy, Fog, Fog / Windy, Haze, Haze / Windy, Heavy Drizzle, Heavy Rain, Heavy Rain / Windy, Heavy Snow, Heavy Snow / Windy, Heavy T-Storm, Heavy T-Storm / Windy, Heavy Thunderstorms and Rain, Light Blowing Snow, Light Drizzle, Light Drizzle / Windy, Light Freezing Drizzle, Light Freezing Fog, Light Freezing Rain, Light Freezing Rain / Windy, Light Ice Pellets, Light Rain, Light Rain / Windy, Light Rain Shower, Light Rain with Thunder, Light Sleet, Light Snow, Light Snow / Windy, Light Snow and Sleet, Light Snow and Sleet / Windy, Light Thunderstorms and Rain, Mist, Mostly Cloudy, Mostly Cloudy / Windy, N/A Precipitation, Overcast, Partial Fog, Partly Cloudy, Partly Cloudy / Windy, Patches of Fog, Rain, Rain / Windy, Rain Shower, Sand / Dust Whirlwinds, Scattered Clouds, Shallow Fog, Showers in the Vicinity, Sleet, Smoke, Smoke / Windy, Snow, Snow / Windy, Snow and Sleet / Windy, Squalls / Windy, T-Storm, T-Storm / Windy, Thunder, Thunder / Windy, Thunder / Wintry Mix / Windy, Thunder in the Vicinity, Thunderstorms and Rain, Widespread Dust, Wintry Mix, Wintry Mix / Windy. 
+
+- negative correlation of the accident severity with the following variables:
+Start_Time,
+Wind_Chill,
+Pressure,
+Wind_DirectionVAR, Wind_DirectionVariable,
+Wind_Direction: East, ENE, ESE, NNW, North, NW, South, SSE, West, WSW, 
+Precipitation,      
+Weather_Condition: Drizzle / Windy, Ice Pellets.   
+
+P-value 
+When P-value has *** it means that P ≤ 0.001.
+The lower the P-value, the greater the statistical significance of the relationships between dependent variable Severe and the independent variables. 
+The following variables are statistically significant:
+Start_Time  
+End_Time                                    
+Temperature                                    
+Wind_Chill                                    
+Humidity                                       
+Pressure                                      
+Visibility  
+Wind_Direction(Wind_DirectionEast, Wind_DirectionNNE, Wind_DirectionNNW, Wind_DirectionNorth, Wind_DirectionNW, Wind_DirectionS, Wind_DirectionSouth, Wind_DirectionSSE, Wind_DirectionSSW, Wind_DirectionSW, Wind_DirectionWest)
+Wind_Speed      
+"
+
+#Decision Tree for weather related variables with positive correlation 
+library(party)
+library(sandwich)
+
+#data partitioning into Training and Validation datasets 
+set.seed(1234)
+ind <- sample(2, nrow(clean_US_Accidents), replace = T, prob = c(0.8, 0.2))
+trainUSAccident <- clean_US_Accidents[ind == 1,]
+testUSAccident <- clean_US_Accidents[ind == 2,]
+
+decisionTree <- ctree(catSevere ~ Temperature + Humidity + Visibility + Wind_Speed, data = trainUSAccident)
+decisionTree
+plot(decisionTree)
+
+#KNN classification prediction - predicting severity (Severe) based on weather related variables 
+
+set.seed(9850)
+str(clean_US_Accidents)
+#334821 obs 
+
+#generating random deviates 
+unifUSAccidents <- runif(nrow(clean_US_Accidents))
+unifUSAccidents
+
+clean_US_AccidentsMix <- clean_US_Accidents[order(unifUSAccidents), ]
+head(clean_US_AccidentsMix)
+View(clean_US_AccidentsMix)
+
+#data normalization 
+normalize <- function(x) {return( (x - min(x)) / (max(x) - min(x)) )}
+
+clean_US_AccidentsMixNorm <- as.data.frame(lapply(clean_US_AccidentsMix[,c(22, 24, 26, 28)], normalize))
+str(clean_US_AccidentsMixNorm)
+
+#creating training and testing dataset for Temperature, Humidity, Visibility,  Wind_Speed
+clean_US_AccidentsMixNormTrain <- clean_US_AccidentsMixNorm[1:267857, ] #0.8
+clean_US_AccidentsMixNormTest <- clean_US_AccidentsMixNorm[267858:334821, ] #0.2
+
+str(clean_US_AccidentsMixNormTrain) #267857 obs 
+NROW(clean_US_AccidentsMixNormTrain) #267857 rows 
+str(clean_US_AccidentsMixNormTest) #66964 obs 
+NROW(clean_US_AccidentsMixNormTest) #66964 rows 
+
+#creating training and testing dataset for Severity 
+clean_US_AccidentsMixNormTrainTarget <- clean_US_AccidentsMix[1:267857, 2] #0.8
+clean_US_AccidentsMixNormTestTarget <- clean_US_AccidentsMix[267858:334821, 2] #0.2
+
+str(clean_US_AccidentsMixNormTrainTarget) #267857 obs 
+NROW(clean_US_AccidentsMixNormTrainTarget) #267857 rows 
+str(clean_US_AccidentsMixNormTestTarget) #66964 obs 
+NROW(clean_US_AccidentsMixNormTestTarget) #66964 rows 
+
+train_pointsdf <- as.data.frame(clean_US_AccidentsMixNormTrain)
+test_pointsdf <- as.data.frame(clean_US_AccidentsMixNormTest)
+train_targetdf <- as.data.frame(clean_US_AccidentsMixNormTrainTarget)
+test_targetdf <- as.data.frame(clean_US_AccidentsMixNormTestTarget)
+
+cl = train_targetdf[,1]
+
+library(class)
+#k = sq root of 334821 obs = 578.6 = odd is 579. 579 gives an error of too many ties in knn, so we use k = 497 
+knnmodel <- knn(train = train_pointsdf, test = test_pointsdf, cl, k = 497)
+knnmodel
+
+vecTestTarget = test_targetdf[,1]
+# 4x4 confusion matrix 
+table(vecTestTarget, knnmodel)
+
+"
+True Positive (correctly predicted):
+1: 174 
+2: 57631 
+3: 0
+4: 0  
+
+Incorrectly predicted:
+actual 1 classified as 2: 2152
+actual 1 classified as 3: 0
+actual 1 classified as 4: 0
+
+actual 2 classified as 1: 87
+actual 2 classified as 3: 0 
+actual 2 classified as 4: 0 
+
+actual 3 classified as 1: 1
+actual 3 classified as 2: 2921
+actual 3 classified as 4: 0 
+
+actual 4 classified as 1: 23
+actual 4 classified as 2: 3975 
+actual 4 classified as 3: 0 
+
+False Negative:
+1: 2154 + 0 + 0 = 2154 
+2: 87 + 0 + 0 = 87
+3: 1 + 2921 + 0 = 2922 
+4: 23 + 3975  + 0 = 3998 
+
+False Positive (Type 1 Error): 
+1: 87 + 1 + 23 = 111
+2: 2152 + 2921 + 3975 = 9048 
+3: 0 + 0 + 0 = 0 
+4: 0 + 0 + 0 = 0 
+
+True Negative (Type 2 Error):
+1: 57631 + 2921 + 3975 = 64527
+2: 174 + 1 + 23 = 198 
+3: 174 + 2152 + 87 + 57631 + 23 + 3975 = 64042 
+4: 174 + 2152 + 87 + 57631 + 1 + 2921 = 62966 
+
+Error rate 
+ERR = (FP + FN) / (TP + TN + FP + FN)
+The best error rate is 0, whereas the worst is 1.
+ERR_1 = (111 + 2154) / (174 + 64527 + 111 + 2154) = 2265 / 66966 = 0.03 
+ERR_2 = (9048 + 87) / (57631 + 198 + 9048 + 87) = 9135 / 66964 = 0.14
+ERR_3 = (0 + 2922) / (0 + 64042 + 0 + 2922) = 2922 / 66964 = 0.04 
+ERR_4 = (0 + 3998) / (0 + 62966 + 0 + 3998) = 3998 / 66964 = 0.06  
+
+Accuracy
+ACC = sum(TP + TN) / (TP + TN + FP + FN) or 1 - ERR
+The best accuracy is 1, whereas the worst is 0.
+ACC_1 = (174 + 64527) / (174 + 64527 + 111 + 2154) = 64701 / 66966 = 0.97 
+ACC_2 = (57631 + 198) / (57631 + 198 + 9048 + 87) = 57829 / 66964 = 0.86 
+ACC_3 = (0 + 64042) / (0 + 64042 + 0 + 2922) = 64042 / 66964 = 0.96 
+ACC_4 = (0 + 62966) / (0 + 62966 + 0 + 3998) = 62966 / 66964 = 0.94 
+
+Recall (Sensitivity) 
+REC = TP / (TP + FN) 
+The best Recall is 1, whereas the worst is 0.
+REC_1 = 174 / (174 + 2154) = 174 / 2328 = 0.07 
+REC_2 = 57631 / (57631 + 87) = 57631 / 57718 = 0.99 ~ 1 
+REC_3 = 0 
+REC_4 = 0 
+
+Specificity 
+SP = TN / (TN + FP)  
+The best specificity is 1, whereas the worst is 0.
+SP_1 = 64527 / (64527 + 111) = 64527 / 64638 = 0.99 ~ 1
+SP_2 = 198 / (198 + 9048 ) = 198 / 9246 = 0.02 
+SP_3 = 64042 / (64042 + 0) = 1 
+SP_4 = 62966 / (62966  + 0) = 1 
+
+Precision 
+PREC = TP / (TP + FP)
+The best precision is 1, whereas the worst is 0.
+PREC_1 = 174 / (174 + 111) = 174 / 285 = 0.61 
+PREC_2 = 57631 / (57631 + 9048) = 57631 / 66679 = 0.86  
+PREC_3 = 0
+PREC_4 = 0
+"
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
